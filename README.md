@@ -1,49 +1,127 @@
-# 🥤 Coca-Cola - 3D Landing Page
+# 🍺 betalendingbrezeenghead
 
-<div align="center">
-  <h2>🎬 Project Screenshots</h2>
-  
-  <img src="src/slices/Hero/screenshot-default.png" alt="Hero Section" width="800" style="margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
-  
-  <img src="src/slices/Carousel/screenshot-default.png" alt="Interactive Carousel" width="800" style="margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
-  
-  <img src="src/slices/BigText/screenshot-default.png" alt="Big Text Section" width="800" style="margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
-  
-  <img src="src/slices/SkyDive/screenshot-default.png" alt="Sky Dive Section" width="800" style="margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
-</div>
+**4–5 июня 2026, личный проект.** Задача: показать пять сортов пива в браузере так, чтобы вкус и цвет передавались картинкой, а не списком текста. Решение: **лендинг Breezing Head** — Next.js 14 с 3D-сценой на three.js, вращающейся каруселью банок, скролл-анимациями на GSAP и контентом из Prismic.
 
-## 🚀 Key Features
+Всего два дня работы. Всё десктопное содержимое ужато до мобильного: 3D включается и там, размеры текста уменьшены, рендер облегчён.
 
-| Feature | Description | Technology |
-|---------|-------------|------------|
-| 🎠 **Interactive Carousel** | 3D Soda Can Rotation with Multiple Flavors | Three.js, React Three Fiber |
-| 📝 **Dynamic Text Sections** | Animated Typography & Content | GSAP, CSS Animations |
-| 🪂 **Sky Dive Section** | Immersive 3D Environments | 3D Scenes, Environment Mapping |
-| 🏠 **Hero Section** | 3D Scene with Floating Elements | Interactive 3D, Physics |
-| 🎨 **Responsive Design** | Works on All Devices | Tailwind CSS, Mobile-First |
+---
 
-## 🎯 Project Sections
+## Сорта
 
-### 🎠 Interactive Carousel
-- **5 Different Flavors**: Coca-Cola Classic, Fanta, Sprite, Thumbs Up, Minute Maid
-- **3D Can Rotation** with physics-based spinning
-- **Dynamic Color Changes** for each flavor
-- **Smooth Transitions** between different soda varieties
+Пять сортов в карусели с собственным цветом:
 
-### 📝 Dynamic Text Sections
-- **Animated Typography** with staggered reveals
-- **Scroll-triggered animations** that respond to user interaction
-- **Professional typography** with custom font integration
-- **Responsive text layouts** for all screen sizes
+| Сорт | Цвет | Ключ в коде |
+|---|---|---|
+| Светлое | `#3D2417` | `blackCherry` |
+| Пшеничное | `#A86F2E` | `grape` |
+| IPA Хмельное | `#7A4A1F` | `lemonLime` |
+| Тёмный Стаут | `#0F0805` | `strawberryLemonade` |
+| Ягодный Эль | `#C9783F` | `watermelon` |
 
-### 🪂 Sky Dive Section
-- **Immersive 3D Environments** with realistic lighting
-- **Interactive 3D elements** and animations
-- **Performance optimized** rendering
-- **Dynamic scene management**
+> Ключи в коде остались от газировки и ничего общего с пивом не имеют — переименование не делали, чтобы не ломать привязку к текстурам в Prismic.
 
-### 🏠 Hero Section
-- **3D Scene Integration** with floating elements
-- **Scroll-triggered animations** that respond to user interaction
-- **Dynamic background color transitions**
-- **Responsive text animations** with staggered reveals
+## Секции
+
+Всё набирается из Prismic-слайсов, собранных в `src/slices/`:
+
+| Слайс | Что делает |
+|---|---|
+| **Hero** | 3D-сцена с плавающими элементами, реакцией на скролл, сменой фона |
+| **Carousel** | вращение 3D-банок с физикой, переключение вкуса, смена цвета |
+| **BigText** | крупная анимированная типографика |
+| **SkyDive** | immersive 3D-окружение с реалистичным освещением, `Scene.tsx` + `model.json` |
+| **AlternatingText** | чередующиеся текстовые блоки |
+
+Анимации скролла на GSAP с `pin` и `ScrollTrigger`. Один из фиксов — consolidation триггеров в SkyDive, иначе GSAP конфликтовал на пине.
+
+## Стек
+
+- **Next.js 14** App Router, **React 18**, TypeScript
+- **Prismic** + Slice Machine — контент и слайсы через CMS
+- **three.js** + **@react-three/fiber** + **@react-three/drei** — 3D, **zustand** — состояние
+- **GSAP** + **@gsap/react** — скролл-анимации
+- **Tailwind CSS v3**, PostCSS, clsx
+- **Vercel** — деплой, регион `fra1`
+- `r3f-perf` для замеров производительности рендера
+
+## Запуск
+
+Нужен Node.js 18+ и npm.
+
+```bash
+npm install
+npm run dev
+```
+
+`dev` поднимает сразу Next и Slice Machine через `concurrently`.
+
+| Скрипт | Что делает |
+|---|---|
+| `npm run dev` | Next и Slice Machine вместе |
+| `npm run next:dev` | только Next |
+| `npm run slicemachine` | только Slice Machine |
+| `npm run build` | продакшен-сборка |
+| `npm run start` | запуск собранного |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier |
+
+## CMS
+
+Prismic-репозиторий в `slicemachine.config.json` называется **`fizzi`** — это имя осталось от демо-стенда Coca-Cola. `apiEndpoint` пустой.
+
+Контент лежит в Prismic, поэтому без доступа к репозиторию страницы будут пустыми. Локальный симулятор слайсов — `http://localhost:3000/slice-simulator`, кастомный тип один: `page`.
+
+## Мобильная оптимизация
+
+Основная работа второго дня:
+
+- 3D включён на мобильных — убран `hidden md:block` в Hero
+- `DPR`, тени и число пузырьков снижены
+- Environment HDR на мобильных отключён
+- Банок на экране осталось две вместо трёх
+- Размеры всех текстов уменьшены, чтобы не было переполнения и наложения
+
+## Структура
+
+```
+betalendingbrezeenghead/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx        главная, метаданные бренда
+│   │   ├── contact/        страница контактов
+│   │   └── layout.tsx
+│   ├── slices/
+│   │   ├── Hero/           3D-сцена
+│   │   ├── Carousel/       банки, FLAVORS, WavyCircles, стрелки
+│   │   ├── BigText/
+│   │   ├── SkyDive/        Scene.tsx, model.json, mocks.json
+│   │   └── AlternatingText/
+│   ├── components/         Header, Footer, BreezingheadLogo
+│   ├── data/
+│   └── hooks/
+├── customtypes/page/       единственный кастомный тип Prismic
+├── public/
+│   ├── labels/             6 PNG, 28 МБ
+│   ├── textures/
+│   ├── Soda-can.gltf/.bin  модель банки
+│   ├── fonts/
+│   └── hdr/
+├── slicemachine.config.json
+├── prismicio-types.d.ts
+└── vercel.json
+```
+
+## Известные ограничения
+
+- **Заголовок старого README врал.** Проект назывался «Coca-Cola — 3D Landing Page», хотя это лендинг пива Breezing Head. Заголовок и описание про «насыщенный вкус, хмелевой аромат, низкая калорийность» остались от газировки — пришлось переписать.
+- **`public/labels/` занимает 28 МБ** — шесть PNG по 5–8 МБ каждый. Это больше половины веса репозитория, и они грузятся на мобильных. Нужен WebP или AVIF.
+- **`package.json` не переименован:** имя осталось `nextjs-starter-prismic-minimal`, автор — `Prismic`. Это стартовый шаблон Prismic, а не ваш пакет.
+- **Лицензии Apache-2.0 в репозитории нет**, хотя она заявлена в `package.json`. Формально лицензирования нет, и права на исходный шаблон Prismic не подтверждены.
+- **Контент не загрузится без Prismic:** `apiEndpoint` пустой, имя репозитория `fizzi`, ключ доступа отсутствует.
+- **Модель банки — газировочная.** `Soda-can.gltf` осталась от шаблона, поэтому на лендинге пива крутится банка из-под колы.
+- **Ключи вкусов названы по газировке** — `blackCherry`, `grape`, `lemonLime`.
+- **Тестов нет** — при 3D и GSAP это заметно, регрессии ловятся только руками.
+
+## Лицензия
+
+Файл `LICENSE` отсутствует, при этом `package.json` объявляет Apache-2.0 и указывает автора Prismic. Проект собран на основе стартового шаблона Prismic, так что лицензию и атрибуцию нужно оформить явно. Скажи, какую поставить — добавлю файл и поправлю `package.json`.
