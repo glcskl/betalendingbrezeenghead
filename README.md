@@ -1,127 +1,109 @@
-# 🍺 betalendingbrezeenghead
+# betalendingbrezeenghead — 3D beer presentation
 
-**4–5 июня 2026, личный проект.** Задача: показать пять сортов пива в браузере так, чтобы вкус и цвет передавались картинкой, а не списком текста. Решение: **лендинг Breezing Head** — Next.js 14 с 3D-сценой на three.js, вращающейся каруселью банок, скролл-анимациями на GSAP и контентом из Prismic.
+A browser page that presents five beer varieties in a way that conveys taste and colour visually, rather than describing them in a table. Each variety gets its own 3D scene, with scroll-driven motion, bubbles and parallax text.
 
-Всего два дня работы. Всё десктопное содержимое ужато до мобильного: 3D включается и там, размеры текста уменьшены, рендер облегчён.
+Built as a personal project for 4 and 5 June 2026.
 
----
+## Features
 
-## Сорта
+- 3D scenes rendered in the browser with Three.js and React Three Fiber
+- Scroll-driven animation that moves the camera between scenes
+- Bubble and particle effects for depth
+- Parallax and alternating text sections for storytelling
+- Horizontal carousel with custom arrow controls
+- Content managed in Prismic through Slice Machine
+- Deployment to Vercel automated on push
 
-Пять сортов в карусели с собственным цветом:
+## Tech stack
 
-| Сорт | Цвет | Ключ в коде |
-|---|---|---|
-| Светлое | `#3D2417` | `blackCherry` |
-| Пшеничное | `#A86F2E` | `grape` |
-| IPA Хмельное | `#7A4A1F` | `lemonLime` |
-| Тёмный Стаут | `#0F0805` | `strawberryLemonade` |
-| Ягодный Эль | `#C9783F` | `watermelon` |
+| Layer | Technology |
+| --- | --- |
+| Framework | Next.js |
+| Language | TypeScript |
+| 3D | Three.js with React Three Fiber and Drei |
+| Animation | GSAP with `@gsap/react` |
+| State | Zustand |
+| Content management | Prismic with Slice Machine |
+| Styling | Tailwind CSS |
+| Hosting | Vercel |
 
-> Ключи в коде остались от газировки и ничего общего с пивом не имеют — переименование не делали, чтобы не ломать привязку к текстурам в Prismic.
+## Getting started
 
-## Секции
+### Requirements
 
-Всё набирается из Prismic-слайсов, собранных в `src/slices/`:
+- Node.js 20 or newer
+- A Prismic repository, for content changes
+- Optional: the Slice Machine app, for editing slices visually
 
-| Слайс | Что делает |
-|---|---|
-| **Hero** | 3D-сцена с плавающими элементами, реакцией на скролл, сменой фона |
-| **Carousel** | вращение 3D-банок с физикой, переключение вкуса, смена цвета |
-| **BigText** | крупная анимированная типографика |
-| **SkyDive** | immersive 3D-окружение с реалистичным освещением, `Scene.tsx` + `model.json` |
-| **AlternatingText** | чередующиеся текстовые блоки |
+### Environment variables
 
-Анимации скролла на GSAP с `pin` и `ScrollTrigger`. Один из фиксов — consolidation триггеров в SkyDive, иначе GSAP конфликтовал на пине.
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_PRISMIC_ENVIRONMENT` | yes | Prismic environment name |
+| `PRISMIC_ACCESS_TOKEN` | build only | Read token, needed for content that is not public |
+| `NEXT_PUBLIC_SITE_URL` | recommended | Canonical site URL, used by metadata |
 
-## Стек
+Create a `.env.local` file in the project root:
 
-- **Next.js 14** App Router, **React 18**, TypeScript
-- **Prismic** + Slice Machine — контент и слайсы через CMS
-- **three.js** + **@react-three/fiber** + **@react-three/drei** — 3D, **zustand** — состояние
-- **GSAP** + **@gsap/react** — скролл-анимации
-- **Tailwind CSS v3**, PostCSS, clsx
-- **Vercel** — деплой, регион `fra1`
-- `r3f-perf` для замеров производительности рендера
+```
+NEXT_PUBLIC_PRISMIC_ENVIRONMENT=your-environment
+NEXT_PUBLIC_SITE_URL=https://your-domain
+```
 
-## Запуск
-
-Нужен Node.js 18+ и npm.
+### Installation
 
 ```bash
+git clone https://github.com/glcskl/betalendingbrezeenghead.git
+cd betalendingbrezeenghead
 npm install
+```
+
+### Running
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-`dev` поднимает сразу Next и Slice Machine через `concurrently`.
+Production build:
 
-| Скрипт | Что делает |
-|---|---|
-| `npm run dev` | Next и Slice Machine вместе |
-| `npm run next:dev` | только Next |
-| `npm run slicemachine` | только Slice Machine |
-| `npm run build` | продакшен-сборка |
-| `npm run start` | запуск собранного |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier |
-
-## CMS
-
-Prismic-репозиторий в `slicemachine.config.json` называется **`fizzi`** — это имя осталось от демо-стенда Coca-Cola. `apiEndpoint` пустой.
-
-Контент лежит в Prismic, поэтому без доступа к репозиторию страницы будут пустыми. Локальный симулятор слайсов — `http://localhost:3000/slice-simulator`, кастомный тип один: `page`.
-
-## Мобильная оптимизация
-
-Основная работа второго дня:
-
-- 3D включён на мобильных — убран `hidden md:block` в Hero
-- `DPR`, тени и число пузырьков снижены
-- Environment HDR на мобильных отключён
-- Банок на экране осталось две вместо трёх
-- Размеры всех текстов уменьшены, чтобы не было переполнения и наложения
-
-## Структура
-
-```
-betalendingbrezeenghead/
-├── src/
-│   ├── app/
-│   │   ├── page.tsx        главная, метаданные бренда
-│   │   ├── contact/        страница контактов
-│   │   └── layout.tsx
-│   ├── slices/
-│   │   ├── Hero/           3D-сцена
-│   │   ├── Carousel/       банки, FLAVORS, WavyCircles, стрелки
-│   │   ├── BigText/
-│   │   ├── SkyDive/        Scene.tsx, model.json, mocks.json
-│   │   └── AlternatingText/
-│   ├── components/         Header, Footer, BreezingheadLogo
-│   ├── data/
-│   └── hooks/
-├── customtypes/page/       единственный кастомный тип Prismic
-├── public/
-│   ├── labels/             6 PNG, 28 МБ
-│   ├── textures/
-│   ├── Soda-can.gltf/.bin  модель банки
-│   ├── fonts/
-│   └── hdr/
-├── slicemachine.config.json
-├── prismicio-types.d.ts
-└── vercel.json
+```bash
+npm run build
+npm start
 ```
 
-## Известные ограничения
+Slice development, when editing content models:
 
-- **Заголовок старого README врал.** Проект назывался «Coca-Cola — 3D Landing Page», хотя это лендинг пива Breezing Head. Заголовок и описание про «насыщенный вкус, хмелевой аромат, низкая калорийность» остались от газировки — пришлось переписать.
-- **`public/labels/` занимает 28 МБ** — шесть PNG по 5–8 МБ каждый. Это больше половины веса репозитория, и они грузятся на мобильных. Нужен WebP или AVIF.
-- **`package.json` не переименован:** имя осталось `nextjs-starter-prismic-minimal`, автор — `Prismic`. Это стартовый шаблон Prismic, а не ваш пакет.
-- **Лицензии Apache-2.0 в репозитории нет**, хотя она заявлена в `package.json`. Формально лицензирования нет, и права на исходный шаблон Prismic не подтверждены.
-- **Контент не загрузится без Prismic:** `apiEndpoint` пустой, имя репозитория `fizzi`, ключ доступа отсутствует.
-- **Модель банки — газировочная.** `Soda-can.gltf` осталась от шаблона, поэтому на лендинге пива крутится банка из-под колы.
-- **Ключи вкусов названы по газировке** — `blackCherry`, `grape`, `lemonLime`.
-- **Тестов нет** — при 3D и GSAP это заметно, регрессии ловятся только руками.
+```bash
+npm run slicemachine
+```
 
-## Лицензия
+## Project structure
 
-Файл `LICENSE` отсутствует, при этом `package.json` объявляет Apache-2.0 и указывает автора Prismic. Проект собран на основе стартового шаблона Prismic, так что лицензию и атрибуцию нужно оформить явно. Скажи, какую поставить — добавлю файл и поправлю `package.json`.
+```
+src/slices/          Prismic slices, one directory per section
+  Hero/              opening scene
+  SkyDive/           scrolling descent scene
+  BigText/           oversized typography section
+  AlternatingText/   image and text pairs
+  Carousel/          horizontal beer carousel
+src/app/
+  layout.tsx         root layout
+  contact/page.tsx   contact page
+customtypes/         generated Prismic custom type definitions
+slicemachine.config.json
+vercel.json
+```
+
+## Content
+
+Page composition is defined in Prismic. Each section on the page is a slice, and the frontend renders whatever slices the document contains, so reordering or removing a section requires no code change.
+
+## Deployment
+
+`vercel.json` holds the build configuration. The `Vercel Deploy` workflow redeploys automatically on every push, so a content or code change goes live without a manual step.
+
+## Notes
+
+This project is personal and a portfolio piece. Brand names and labels shown in the page are illustrative and are not an endorsement.
